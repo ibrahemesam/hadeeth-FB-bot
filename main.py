@@ -128,6 +128,7 @@ def fetch_hadeeth_by_id(hadeeth_id):
     hadeeth = GET(f'https://hadeethenc.com/api/v1/hadeeths/one/?language=ar&id={hadeeth_id}').json()
     hadeeth = f"{hadeeth['hadeeth']}\n- {hadeeth['grade']} -"
     return hadeeth
+
 hadeeth = fetch_hadeeth_by_id(get_random_hadeeth_id())
 ## -:step 3:- ##
 from requests import post as POST
