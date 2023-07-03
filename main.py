@@ -61,9 +61,8 @@ user_access_token = db.config_read('user_access_token')
 create_new_user_access_token = False
 if user_access_token is None:
     create_new_user_access_token = True
-else:
-    if not facebook.is_token_valid(user_access_token):
-        create_new_user_access_token = True
+elif not facebook.is_token_valid(user_access_token):
+    create_new_user_access_token = True
 if create_new_user_access_token:
     # fetch FB cookies
     fb_cookies = db.config_read('fb_cookies')
