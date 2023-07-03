@@ -73,9 +73,8 @@ if create_new_user_access_token:
     create_new_fb_cookies = False
     if not fb_cookies:
         create_new_fb_cookies = True
-    else:
-        if not facebook.is_cookies_valid(fb_cookies):
-            create_new_fb_cookies = True
+    elif not facebook.is_cookies_valid(fb_cookies):
+        create_new_fb_cookies = True
     if create_new_fb_cookies:
         fb_cookies = facebook.login_fb(username, password)
         # save fb_cookies to db
@@ -128,7 +127,10 @@ def fetch_hadeeth_by_id(hadeeth_id):
     hadeeth = f"{hadeeth['hadeeth']}\n- {hadeeth['grade']} -"
     return hadeeth
 
-hadeeth = fetch_hadeeth_by_id(get_random_hadeeth_id())
+def get_random_hadeeth():
+    return fetch_hadeeth_by_id(get_random_hadeeth_id())
+
+hadeeth = get_random_hadeeth()
 
 ## -:step 3:- ##
 from requests import post as POST
