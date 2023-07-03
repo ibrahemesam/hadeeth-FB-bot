@@ -130,6 +130,7 @@ def fetch_hadeeth_by_id(hadeeth_id):
     return hadeeth
 
 hadeeth = fetch_hadeeth_by_id(get_random_hadeeth_id())
+
 ## -:step 3:- ##
 from requests import post as POST
 POST(
