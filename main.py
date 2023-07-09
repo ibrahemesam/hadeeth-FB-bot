@@ -22,9 +22,9 @@
 
 ## -:configuration:- ##
 username = "iimosa7777@gmail.com"
-password = "*********"
-APP_ID = 1033059954377312
-fb_page = 'https://www.facebook.com/Auto.Legend.Online.Arabic/'
+password = "**********"
+APP_ID = 6316090198505232
+fb_page = 113847078429026
 
 # check type of fb_page:-
 # fb_page = 'https://www.facebook.com/Auto.Legend.Online.Arabic/' => url => username
@@ -33,7 +33,7 @@ fb_page = 'https://www.facebook.com/Auto.Legend.Online.Arabic/'
 # fb_page = 'Auto.Legend.Online.Arabic' => username => username
 fb_page_type = type(fb_page)
 if fb_page_type is str:
-    if len(fb_page) == 16:
+    if len(fb_page) in range(10, 20):
         try:
             int(fb_page)
             fb_page_type = 'uid'
@@ -46,12 +46,18 @@ if fb_page_type is str:
         fb_page = fb_page.replace(' ', '').replace('/', '')
 elif fb_page_type is int:
     fb_page = str(fb_page)
-    if len(fb_page) == 16:
+    if len(fb_page) in range(10, 20):
         fb_page_type = 'uid'
 
 # init DB
 from db import db
 db = db()
+
+# check if APP_ID changed
+if str(APP_ID) != str(db.config_read('APP_ID')):
+    db.config_write('APP_ID', APP_ID)
+    db.config_write('user_access_token', None)
+    db.config_write('page_access_token', None)
 
 ## -:step 1:- ##
 import json
@@ -86,7 +92,10 @@ if create_new_user_access_token:
     # save user_access_token to db
     db.config_write('user_access_token', user_access_token)
 # fetch page_access_token
-current_fb_page_uid = facebook.get_uid_by_username(fb_page, user_access_token)
+if fb_page_type == 'uid':
+    current_fb_page_uid = fb_page
+else:
+    current_fb_page_uid = facebook.get_uid_by_username(fb_page, user_access_token)
 page_access_token = db.config_read('page_access_token')
 create_new_page_access_token = False
 if page_access_token is None:
@@ -134,12 +143,24 @@ hadeeth = get_random_hadeeth()
 
 ## -:step 3:- ##
 from requests import post as POST
-POST(
+r = POST(
     f"https://graph.facebook.com/v15.0/{current_fb_page_uid}/feed",
     data = {
             'message': hadeeth,
             'access_token': page_access_token,
         },
     )
+if r.ok:
+    print(f'[success]: url: https://facebook.com/{r.json()["id"]}')
+else:
+    if r.status_code == 400:
+        print('[failure]: access_token is incorrect')
+    elif r.status_code == 403:
+        if 'pages_manage_posts' in r.text:
+            print('[failure]: insufficient permissions. missing "pages_manage_posts" and/or "pages_read_engagement"')
 
 # NOTE: fix internet disconnect & timeout errors by using "unsafe" methods
+# TODO:
+#   - [x] make tutorial of app creation
+#         - goto https://developers.facebook.com/apps/creation/
+#   - [ ] automate adding permissions to app to post on all pages
